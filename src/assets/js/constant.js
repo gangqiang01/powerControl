@@ -50,5 +50,8 @@ export {
 
     BOOTANIMATIONTYPE as bootanimationType,
     FILETYPE as fileType,
-    FILEFORMAT as fileFormat
+    FILEFORMAT as fileFormat,
+    IP as ip,
+    PORT as port,
+    PROTOCOL as protocol
 }
