@@ -5,14 +5,6 @@ import {workorder} from './lwm2mMap'
 export default (function () {
     Vue.filter("time", (value) => {
         if(value){
-            return s_to_hs(value);
-        }else{
-            return "00:00";
-        } 
-    })
-
-    Vue.filter("time", (value) => {
-        if(value){
             return moment(value).format("YYYY-MM-DD HH:mm:ss")
         }else{
             return "";

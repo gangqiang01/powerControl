@@ -2,7 +2,7 @@
 const APPLICATIONTITLE = "WISE-PaaS/Android-DM";
 
 //footer release time
-const RELEASEDATE = "20191119";
+const RELEASEDATE = "20200106";
 const POWER = "AIM-Android";
 
 //show system app in app market
@@ -29,6 +29,11 @@ const BATCH_INSTALL_TYPE = "bt";
 const BATCH_WL_TYPE = "wlbt";
 const BATCH_FILE_TYPE = "fdbt";
 const SINGLE_FILE_TYPE = "fdsg";
+
+//set server api host
+const IP = window.location.hostname;
+const PORT ="8080";
+const PROTOCOL = "http://";
 
 
 export {

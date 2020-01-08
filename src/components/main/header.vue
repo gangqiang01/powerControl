@@ -1,5 +1,4 @@
 <template>
-        <!-- <el-radio-group v-model="isCollapse" style="margin-bottom: 20px;"> -->
     <el-header class="nav-header">
         <ul class="nav-left" >
             <li @click="collapse()">
@@ -16,7 +15,7 @@
 
     .nav-header{
         background: $lightgray-color;
-        border-bottom: 3px solid $purple-color;
+        border-bottom: 3px solid $androidDM-color;
         display: -webkit-flex;
         display: flex;
         flex-flow: row nowrap;
@@ -44,7 +43,7 @@
                 color:$primary-color; 
             }
         }
+        
     }
    
 </style>
-
