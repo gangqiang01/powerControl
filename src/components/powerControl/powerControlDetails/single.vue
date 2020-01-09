@@ -8,11 +8,12 @@
             <el-col :md="6" :sm="12">
                 <div class="info-box">
                     <div class="info-box-icon bg-SaddleBrown">
-                        <svg t="1577947373271" class="icon m-t-15" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4134" width="42" height="42">
+                        <svg t="1577947373271" class="icon m-t-15 pointer" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4134"
+                         width="42" height="42" @click="shutDown()">
                         <path d="M512 382.892006a63.815334 63.815334 0 0 0 63.815334-63.815334V63.815334a63.815334 63.815334 0 0 0-127.630668 0v255.261338a63.815334 63.815334 0 0 0 63.815334 63.815334z" p-id="4135" :fill="shutdownIconColor"></path>
                         <path d="M809.889981 244.412731a63.815334 63.815334 0 0 0-85.257287 94.893402A312.567508 312.567508 0 0 1 831.076672 574.338009 319.076672 319.076672 0 0 1 192.923328 574.338009a312.567508 312.567508 0 0 1 106.443978-235.031876A63.815334 63.815334 0 0 0 214.110019 244.412731a446.707341 446.707341 0 1 0 595.779962 0z" p-id="4136" :fill="shutdownIconColor"></path>
                         </svg>
-                        <p class="info-box-icon-title">shutdown</p>
+                        <!-- <p class="info-box-icon-title">shutdown</p> -->
                     </div>
                     <el-button type="primary" size="small" @click="shutDown()">Shutdown</el-button>
                 </div>   
@@ -21,11 +22,12 @@
             <el-col :md="6" :sm="12">
                 <div class="info-box">
                     <div class="info-box-icon bg-yellow">
-                        <svg t="1577952813879" class="icon  m-t-15" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9825" width="45" height="45">
+                        <svg t="1577952813879" class="icon  m-t-15 pointer" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9825"
+                         width="45" height="45"  @click="reboot()">
                         <path d="M810.666667 341.333333l-170.666667 170.666667h128c0 141.226667-114.773333 256-256 256a250.453333 250.453333 0 0 1-119.466667-29.866667l-62.293333 62.293334A338.346667 338.346667 0 0 0 512 853.333333c188.586667 0 341.333333-152.746667 341.333333-341.333333h128l-170.666666-170.666667zM256 512c0-141.226667 114.773333-256 256-256 43.093333 0 84.053333 10.666667 119.466667 29.866667l62.293333-62.293334A338.346667 338.346667 0 0 0 512 170.666667c-188.586667 0-341.333333 152.746667-341.333333 341.333333H42.666667l170.666666 170.666667 170.666667-170.666667H256z" :fill="rebootIconColor" p-id="9826"></path>
                         </svg>
 
-                        <p class="info-box-icon-title">reboot</p>
+                        <!-- <p class="info-box-icon-title">reboot</p>  -->
                     </div>
                     <el-button type="primary" size="small" @click="reboot()">Reboot</el-button>
                 </div>  
@@ -178,6 +180,10 @@
             },
 
             reboot(){
+                if(!this.selectedAgentId){
+                    this.$swal("", "Please select device","info");
+                    return;
+                }
                 let data = {
                     appname: this.pkgname,
                     funcid: this.funcIds.setReboot,
@@ -187,6 +193,10 @@
             },
 
             shutDown(){
+                if(!this.selectedAgentId){
+                    this.$swal("", "Please select device","info");
+                    return;
+                }
                 let data = {
                     appname: this.pkgname,
                     funcid: this.funcIds.setShutdown,
@@ -196,6 +206,10 @@
             },
 
             timerShutDown(){
+                if(!this.selectedAgentId){
+                    this.$swal("", "Please select device","info");
+                    return;
+                }
                 if(!this.shutdownTime){
                     this.$swal("", "Please set the shutdown time", 'info');
                     return;
@@ -210,6 +224,10 @@
             },
 
             timerBoot(){
+                if(!this.selectedAgentId){
+                    this.$swal("", "Please select device","info");
+                    return;
+                }
                 if(!this.bootTime){
                     this.$swal("", "Please set the boot time", 'info');
                     return;
@@ -266,8 +284,8 @@
             border-radius: 50%;
             display: block;
             /* float: left; */
-            height: 120px;
-            width: 120px;
+            height: 80px;
+            width: 80px;
             
             line-height: 40px;
             font-size: 45px;
