@@ -45,11 +45,9 @@
             <el-col :md="12" :sm="24">
                 <div class="rectangle-box">
                     <div class="info-box-icon">
-                        <svg t="1578389568714" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="8628" width="36" height="36">
-                        <path d="M512 1003.52C241.664 1003.52 20.48 782.336 20.48 512 20.48 292.864 167.936 98.304 378.88 38.912c10.24-2.048 22.528 4.096 24.576 14.336 2.048 10.24-4.096 22.528-14.336 24.576C196.608 133.12 61.44 311.296 61.44 512c0 247.808 202.752 450.56 450.56 450.56s450.56-202.752 450.56-450.56c0-192.512-122.88-364.544-303.104-428.032-10.24-4.096-16.384-14.336-12.288-26.624 4.096-10.24 16.384-16.384 26.624-12.288C870.4 114.688 1003.52 301.056 1003.52 512c0 270.336-221.184 491.52-491.52 491.52z" p-id="8629" :fill="timerShutdownIconColor"></path>
-                        <path d="M493.568 63.488h40.96v40.96h-40.96zM493.568 161.792h40.96v159.744h-40.96z" p-id="8630" :fill="timerShutdownIconColor"></path>
-                        <path d="M378.88 446.464c24.576 26.624 36.864 63.488 36.864 108.544 0 45.056-12.288 79.872-36.864 108.544-26.624 28.672-61.44 43.008-104.448 43.008-45.056 0-79.872-14.336-104.448-43.008-24.576-28.672-36.864-63.488-36.864-108.544 0-45.056 12.288-79.872 36.864-108.544 24.576-28.672 61.44-43.008 104.448-43.008 43.008 0 79.872 14.336 104.448 43.008z m-178.176 28.672c-16.384 20.48-24.576 47.104-24.576 81.92 0 34.816 8.192 61.44 24.576 81.92 16.384 20.48 40.96 30.72 71.68 30.72s55.296-10.24 71.68-30.72c16.384-20.48 24.576-47.104 24.576-81.92 0-34.816-8.192-63.488-24.576-81.92-16.384-20.48-40.96-30.72-71.68-30.72s-53.248 8.192-71.68 30.72zM659.456 409.6v38.912h-153.6V532.48h145.408v38.912h-145.408v131.072h-45.056V409.6h198.656zM897.024 409.6v38.912h-153.6V532.48h145.408v38.912h-145.408v131.072h-45.056V409.6h198.656z" p-id="8631" :fill="timerShutdownIconColor"></path>
-                        </svg>
+                        <span class="powerControl_label">
+                            Set Shutdown Time:
+                        </span>
                         <el-time-picker
                         arrow-control
                         v-model="shutdownTime"
@@ -59,7 +57,7 @@
                         placeholder="Please set shutdown time"
                         size="small">
                         </el-time-picker>
-                        <el-button type="primary" size="small" @click="timerShutDown()">Shutdown</el-button>
+                        <el-button type="primary" size="small" @click="timerShutDown()">{{shutdownAction}}</el-button>
                     </div>
                     
                 </div> 
@@ -67,11 +65,9 @@
             <el-col :md="12" :sm="24">
                 <div class="rectangle-box">
                     <div class="info-box-icon">
-                        <svg t="1578389685377" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9383" width="36" height="36"><path d="M512 1003.52C241.664 1003.52 20.48 782.336 20.48 512 20.48 292.864 167.936 98.304 378.88 38.912c10.24-2.048 22.528 4.096 24.576 14.336 2.048 10.24-4.096 22.528-14.336 24.576C196.608 133.12 61.44 311.296 61.44 512c0 247.808 202.752 450.56 450.56 450.56s450.56-202.752 450.56-450.56c0-192.512-122.88-364.544-303.104-428.032-10.24-4.096-16.384-14.336-12.288-26.624 4.096-10.24 16.384-16.384 26.624-12.288C870.4 114.688 1003.52 301.056 1003.52 512c0 270.336-221.184 491.52-491.52 491.52z" p-id="9384" :fill="timerBootIconColor"></path>
-                        <path d="M493.568 63.488h40.96v40.96h-40.96zM493.568 161.792h40.96v159.744h-40.96z" p-id="9385" :fill="timerBootIconColor"></path>
-                        <path d="M466.944 446.464c24.576 26.624 36.864 63.488 36.864 108.544 0 45.056-12.288 79.872-36.864 108.544-26.624 28.672-61.44 43.008-104.448 43.008-45.056 0-79.872-14.336-104.448-43.008-24.576-28.672-36.864-63.488-36.864-108.544 0-45.056 12.288-79.872 36.864-108.544 24.576-28.672 61.44-43.008 104.448-43.008 45.056 0 79.872 14.336 104.448 43.008z m-176.128 28.672c-16.384 20.48-24.576 47.104-24.576 81.92 0 34.816 8.192 61.44 24.576 81.92 16.384 20.48 40.96 30.72 71.68 30.72s55.296-10.24 71.68-30.72c16.384-20.48 24.576-47.104 24.576-81.92 0-34.816-8.192-63.488-24.576-81.92-16.384-20.48-40.96-30.72-71.68-30.72s-55.296 8.192-71.68 30.72zM593.92 409.6l149.504 217.088h2.048V409.6h45.056v292.864h-43.008l-151.552-219.136H593.92v219.136h-45.056V409.6H593.92z" p-id="9386" :fill="timerBootIconColor"></path>
-                        </svg>
-
+                        <span class="powerControl_label">
+                            Set Boot Time:
+                        </span>
                         <el-time-picker
                         arrow-control
                         v-model="bootTime"
@@ -81,7 +77,7 @@
                         placeholder="Please set boot time"
                         size="small">
                         </el-time-picker>
-                        <el-button type="primary" size="small" @click="timerBoot()">Boot</el-button>
+                        <el-button type="primary" size="small" @click="timerBoot()">{{bootAction}}</el-button>
                     </div>
                 </div>   
             </el-col>
@@ -95,6 +91,7 @@
     import {getSolutionAppValueApi, setSolutionAppValueApi} from '@/components/restfulapi/solutionAppApi';
 
     import cardTemp from "../../../common/cardTemp"
+import { months } from 'moment';
 
     export default{
         name: 'singleTimerSwitch',
@@ -112,6 +109,8 @@
                     setReboot: "set_reboot",
                     setTimerShutdown: "set_timer_shutdown",
                     setTimerBoot: "set_timer_boot",
+                    getTimerShutdown: "get_shutdown_time",
+                    getTimerBoot: "get_boot_time"
                 },
 
                 timer: null,
@@ -122,7 +121,10 @@
                 rebootIconColor:"#fff",
                 shutdownIconColor: "#fff",
                 timerShutdownIconColor: "#8B4513",
-                timerBootIconColor: "#F0AD4E"
+                timerBootIconColor: "#F0AD4E",
+
+                shutdownAction: "Set",
+                bootAction: "Set"
 
 
             }
@@ -149,8 +151,10 @@
             initData(){
                 this.shutdownTime =  "";
                 this.bootTime = "";
+                this.bootAction = "Set";
+                this.shutdownAction = "Set";
             },
-
+            //Mon Jan 13 2020 14:32:57 GMT+0800 (CST) to 14:42:57
             transferTime(value){
                 let time = new Date(value);
                 let hour = time.getHours()<10? "0"+time.getHours(): time.getHours();
@@ -158,6 +162,68 @@
                 let seconds = time.getSeconds()<10? "0"+time.getSeconds(): time.getSeconds(); 
                 return hour+":"+minute+":"+seconds;
             },
+            //  14.42:57 to Mon Jan 13 2020 14:32:57 GMT+0800 (CST)
+            transToStandardTime(val){
+                if(!val){
+                    return "";
+                }
+                let time=new Date;
+                let y = time.getFullYear(); 
+                let m = time.getMonth(); 
+                let d = time.getDate(); 
+                let hArray = val.split(":");
+                let h = hArray[0];
+                let s = hArray[1];
+                return new Date(y, m, d, h, s);
+            },
+
+            getDeviceVideoStatus(funcid){
+                if(this.selectedAgentId == ""){
+                    console.error("selectAgentId is empty");
+                    return;
+                }
+
+                let data= {
+                    appname: this.pkgname,
+                    funcid: funcid,
+                    param: ""
+                }
+                getSolutionAppValueApi(this.selectedAgentId, this.getTarget, data).then((obj) => {
+                    handleResponse(obj, (res) => {
+
+                        if(res.status === "CONTENT"){
+                            let powerControlObj = JSON.parse(res.content.value);
+                            if(powerControlObj.errcode == 0){
+                                 switch(funcid){
+                                    case this.funcIds.getTimerShutdown:
+                                        let stime = powerControlObj.data.shutdown_time;
+                                        if(stime){
+                                            this.shutdownTime = this.transToStandardTime(stime);
+                                            this.shutdownAction = "Reset";
+                                        }
+
+                                        break;
+                                    case this.funcIds.getTimerBoot:
+                                        let btime = powerControlObj.data.boot_time;
+                                        if(btime){
+                                            this.bootTime = this.transToStandardTime(btime);
+                                            this.bootAction = "Reset";
+                                        }
+                                        break;
+                                    
+                                    default:
+                                        console.error("funcId not support");
+                                }
+                            }else{
+                                console.error("[getSolutionAppValueApi]"+this.funcIds+"#errcode:"+videoObj.errcode);
+                            }
+                           
+                        }
+                        
+                    })
+                })
+            },
+
 
             setSolutionAppValue(data, funcId){
                 if(this.selectedAgentId == ""){
@@ -170,7 +236,23 @@
                     handleResponse(obj, (res) => {
 
                         if(res.status === "CHANGED"){
-                            this.$swal("", "Success", "success")
+                            switch(funcId){
+                                case this.funcIds.setShutdown:
+                                    this.$swal("", "Success", "success")
+                                break;
+                                case this.funcIds.setReboot:
+                                    this.$swal("", "Success", "success")
+                                break;
+                                case this.funcIds.setTimerShutdown:
+                                    this.$swal("", "Success", "success")
+                                break;
+                                case this.funcIds.setTimerBoot:
+                                     this.$swal("", "Success", "success")
+                                break;
+                                default:
+                                    console.error("funcId not support")
+                                
+                            }
                         }else{
                             _g.handleError(res); 
                         }
@@ -252,6 +334,8 @@
             selectedAgentId(val){
                 if(this.isSingleMode) {
                     this.initData();
+                    this.getDeviceVideoStatus(this.funcIds.getTimerShutdown);
+                    this.getDeviceVideoStatus(this.funcIds.getTimerBoot);
                 }
             },
            
@@ -317,8 +401,14 @@
             display: block;
             width: 85%;
             /* float: left; */
-            
-            font-size: 45px;
+            span{
+                font-size: 14px;
+                color: #606266;
+                text-align: right;
+                vertical-align: middle;
+                margin-right: 5px;
+            }
+           
             /* background: rgba(0, 0, 0, 0.2); */
             margin-top: 15px;
             margin: 0.6rem auto;
