@@ -127,9 +127,6 @@ const commonFn = {
         }
     },
     timer: null,
-    etimer: null,
-    mtimer: null,
-    
 
     removeLetter(str) {
         let i=0
@@ -145,7 +142,13 @@ const commonFn = {
     // trim string
     trim(str){
         return str.replace(/^\s+|\s+$/g,"");
-    }
+    },
+
+    doBeforeLoginout(){
+        cookie.setCookie("powerControlToken",'',0)
+        window.clearInterval(_g.timer);
+        _g.timer = null;
+    },
     
 }
 

@@ -41,27 +41,15 @@
                     </svg>
                     Timer Switch
                 </span>
-                <el-col :md="12" :sm="24">
-                    <div class="rectangle-box">
-                        <div class="info-box-icon">
-                             <span class="powerControl_label">
-                                Set Shutdown Time:
-                            </span>
-                            <el-time-picker
-                            arrow-control
-                            v-model="shutdownTime"
-                            :picker-options="{
-                                selectableRange: '00:00:00 - 23:59:59'
-                            }"
-                            placeholder="Please set time"
-                            size="small">
-                            </el-time-picker>
-                            <el-button type="primary" size="small" @click="timerShutDown()">{{shutdownAction}}</el-button>
-                        </div>
-                        
-                    </div> 
-                </el-col>
-                <el-col :md="12" :sm="24">
+                <el-col :md="18" :sm="22" :offset="2">
+                    <div class="switch">
+                        <span>Automatic Power On And Off:</span>
+                        <el-switch
+                        v-model="isAutomatic"
+                        inactive-color="#aaaaaa"
+                        @change="switchAutomatic()">
+                        </el-switch>
+                    </div>
                     <div class="rectangle-box">
                         <div class="info-box-icon">
                             <span class="powerControl_label">
@@ -75,11 +63,30 @@
                                 selectableRange: '00:00:00 - 23:59:59'
                             }"
                             placeholder="Please set time"
-                            size="small">
+                            size="small"
+                            :disabled="!isAutomatic">
                             </el-time-picker>
-                            <el-button type="primary" size="small" @click="timerBoot()">{{bootAction}}</el-button>
+                            
                         </div>
-                    </div>   
+                        <div class="info-box-icon">
+                             <span class="powerControl_label">
+                                Set Shutdown Time:
+                            </span>
+                            <el-time-picker
+                            arrow-control
+                            v-model="shutdownTime"
+                            :picker-options="{
+                                selectableRange: '00:00:00 - 23:59:59'
+                            }"
+                            placeholder="Please set time"
+                            size="small"
+                            :disabled="!isAutomatic">
+                            </el-time-picker>
+                            
+                        </div>
+                        <el-button  type="primary" class="btnAction" size="small" @click="timerPowerOnOff()" :disabled="!isAutomatic">{{powerAction}}</el-button>
+                        
+                    </div> 
                 </el-col>
                 
             </el-tab-pane>
@@ -165,21 +172,25 @@
         width: 100%;
         border-radius: 3px;
         margin: 15px 0px 15px 0px;;
-        text-align: center;
+        text-align: left;
+        .btnAction{
+            margin: 15px 170px;
+            
+        }
         .info-box-icon {
             border-radius: 5px;
             display: block;
-            width: 85%;
+            margin-top: 25px;
             span{
+                display: inline-block;
                 font-size: 14px;
                 color: #606266;
                 text-align: right;
                 vertical-align: middle;
                 margin-right: 5px;
+                width: 230px;
+                text-align: right;
             }
-            /* background: rgba(0, 0, 0, 0.2); */
-            margin-top: 15px;
-            margin: 0.6rem auto;
         
             .icon{
                 position: relative;
@@ -218,6 +229,22 @@
             
         }
     }
+
+    .switch{
+        margin-top: 10px;
+        margin-bottom: 20px;
+        span{
+            display: inline-block;
+            color: #606266;
+            margin-top: 10px;
+            margin-right: 5rem;
+            font-size: 14px;
+            width: 230px;
+            text-align: right;
+            vertical-align: middle;
+            
+        }
+    }
 </style>
 
 <script>
@@ -249,12 +276,14 @@
                 setTarget: "/40007/0/27601",
                 
                 //solution app pkg name
-                pkgname: "com.advantech.poweronoff",
+                pkgname: "com.adv.poweronoff",
                 funcIds: {
                     setShutdown: "set_shutdown",
                     setReboot: "set_reboot",
-                    setTimerShutdown: "set_timer_shutdown",
-                    setTimerBoot: "set_timer_boot",
+                    setPoweronoffTime: "set_poweronoff_time",
+                    getPoweronoffStatus: "get_poweronoff_status",
+                    closePoweronoff: "close_poweronoff",
+                    openPoweronoff: "open_poweronoff"
                 },
                 toperationForm:{
                     taskname: '',
@@ -284,8 +313,8 @@
                 timerBootIconColor: "#F0AD4E",
 
                 fullLoading: false,
-                shutdownAction: "Set",
-                bootAction: "Set"
+                powerAction: "Set",
+                isAutomatic: false
  
             }
         },
@@ -310,6 +339,28 @@
         },
 
         methods:{
+             //Mon Jan 13 2020 14:32:57 GMT+0800 (CST) to 14:42:57
+            transferTime(value){
+                let time = new Date(value);
+                let hour = time.getHours()<10? "0"+time.getHours(): time.getHours();
+                let minute = time.getMinutes()<10? "0"+time.getMinutes(): time.getMinutes();
+                let seconds = time.getSeconds()<10? "0"+time.getSeconds(): time.getSeconds(); 
+                return hour+":"+minute+":"+seconds;
+            },
+            //  14.42:57 to Mon Jan 13 2020 14:32:57 GMT+0800 (CST)
+            transToStandardTime(val){
+                if(!val){
+                    return "";
+                }
+                let time=new Date;
+                let y = time.getFullYear(); 
+                let m = time.getMonth(); 
+                let d = time.getDate(); 
+                let hArray = val.split(":");
+                let h = hArray[0];
+                let s = hArray[1];
+                return new Date(y, m, d, h, s);
+            },
             
             //batch operation
             batchSetSolutionAppValue(funcId, value){
@@ -346,11 +397,57 @@
                           
             },
 
+            getSolutionAppStatus(selectedAgentId, funcid){
+                if(selectedAgentId == ""){
+                    console.error("All devices is offline");
+                    return;
+                }
+
+                let data= {
+                    appname: this.pkgname,
+                    funcid: funcid,
+                    param: ""
+                }
+                getSolutionAppValueApi(selectedAgentId, this.getTarget, data).then((obj) => {
+                    handleResponse(obj, (res) => {
+                        if(res.status === "CONTENT"){
+                            let powerControlObj = JSON.parse(res.content.value);
+                            if(powerControlObj.errcode == 0){
+                                switch(funcid){
+                                    case this.funcIds.getPoweronoffStatus:
+                                        let stime = powerControlObj.data.poweroff_time;
+                                        let btime = powerControlObj.data.poweron_time;
+                                        if(stime&& btime){
+                                            this.shutdownTime = this.transToStandardTime(stime);
+                                            this.bootTime = this.transToStandardTime(btime);
+                                            this.powerAction = "Reset";
+                                        }
+                                        let isAuto = powerControlObj.data.auto_power;
+                                        this.isAutomatic = isAuto== "true"? true: false;
+
+                                        break; 
+                                    default:
+                                        console.error("funcId not support");
+                                }
+                            }else{
+                                this.isAutomatic = false;
+                                console.error("[getSolutionAppValueApi]"+this.funcIds+"#errcode:"+powerControlObj.errcode);
+                            }
+                           
+                        }else{
+                            this.isAutomatic = false;
+                        }
+                        
+                    })
+                })
+            },
+
 
             initPowInfo(){
                 this.toperationForm.taskname = "";
                 this.setTime = "";
                 this.funcId = "";
+                this.getSolutionAppStatus(this.selectedAgentsData[0].value, this.funcIds.getPoweronoffStatus);
             },
 
             getBatchSwitchStatusCount(){
@@ -380,6 +477,8 @@
             initData(){
                 this.shutdownTime =  "";
                 this.bootTime = "";
+                this.powerAction = "Set";
+                this.isAutomatic = false;
             },
 
             handleClick(tab){
@@ -388,10 +487,6 @@
                 }else{
                     this.isShowOverview = false;
                 }
-            },
-
-            isPowerControlFinished(){
-                this.getServerStatus();
             },
             
             transferTime(value){
@@ -450,6 +545,55 @@
                 this.dialogTasknameVisible = true;
             },
 
+            switchAutomatic(){
+                if(this.selectedAgentsData.length === 0){
+                    this.$swal("", "All devices are offline","info").then(() => {
+                        this.isAutomatic= this.isAutomatic == true? false: true;
+                    });
+                    return;
+                }
+                
+                if(this.isAutomatic){
+                    let data = {
+                        appname: this.pkgname,
+                        funcid: this.funcIds.openPoweronoff,
+                        param: ""
+                    }
+                    this.funcId = this.funcIds.openPoweronoff,
+                    this.dialogTasknameVisible = true;
+                    
+                }else{
+                    let data = {
+                        appname: this.pkgname,
+                        funcid: this.funcIds.closePoweronoff,
+                        param: ""
+                    }
+                    this.funcId = this.funcIds.closePoweronoff;
+                    this.dialogTasknameVisible = true;
+                }
+                
+            },
+
+            timerPowerOnOff(){
+                if(this.selectedAgentsData.length === 0){
+                    this.$swal("", "All devices are offline","info");
+                    return;
+                }
+                if(!this.shutdownTime){
+                    this.$swal("", "Please set the shutdown time", 'info');
+                    return;
+                }
+                if(!this.bootTime){
+                    this.$swal("", "Please set the boot time", 'info');
+                    return;
+                }
+                let btime = this.transferTime(this.bootTime);
+                let stime = this.transferTime(this.shutdownTime);
+                this.funcId = this.funcIds.setPoweronoffTime;
+                this.setTime = stime+","+btime;
+                this.dialogTasknameVisible = true;
+            },
+
             batchSwitch(){
                 if(this.selectedAgentsData.length === 0){
                     this.$swal("", "All devices are offline","info");
@@ -464,6 +608,7 @@
 
             isSwitchFinished(){
                 this.initData();
+                this.getSolutionAppStatus(this.selectedAgentsData[0].value, this.funcIds.getPoweronoffStatus);
             }
             
         },
@@ -479,6 +624,7 @@
             groupname(val){
                 if(!this.isSingleMode&& val){
                     this.initData();
+                    this.getSolutionAppStatus(this.selectedAgentsData[0].value, this.funcIds.getPoweronoffStatus);
                 }
             }
         },

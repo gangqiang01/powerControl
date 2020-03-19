@@ -42,30 +42,18 @@
                 </svg>
                 Timer Switch
             </span>
-            <el-col :md="12" :sm="24">
+            <el-col :md="18" :sm="22" :offset="2">
+                <div class="switch">
+                    <span>Automatic Power On And Off:</span>
+                    <el-switch
+                    v-model="isAutomatic"
+                    inactive-color="#aaaaaa"
+                    @change="switchAutomatic()">
+                    </el-switch>
+                </div>
                 <div class="rectangle-box">
                     <div class="info-box-icon">
-                        <span class="powerControl_label">
-                            Set Shutdown Time:
-                        </span>
-                        <el-time-picker
-                        arrow-control
-                        v-model="shutdownTime"
-                        :picker-options="{
-                            selectableRange: '00:00:00 - 23:59:59'
-                        }"
-                        placeholder="Please set shutdown time"
-                        size="small">
-                        </el-time-picker>
-                        <el-button type="primary" size="small" @click="timerShutDown()">{{shutdownAction}}</el-button>
-                    </div>
-                    
-                </div> 
-            </el-col>
-            <el-col :md="12" :sm="24">
-                <div class="rectangle-box">
-                    <div class="info-box-icon">
-                        <span class="powerControl_label">
+                        <span>
                             Set Boot Time:
                         </span>
                         <el-time-picker
@@ -75,11 +63,32 @@
                             selectableRange: '00:00:00 - 23:59:59'
                         }"
                         placeholder="Please set boot time"
-                        size="small">
+                        size="small"
+                        :disabled="!isAutomatic">
                         </el-time-picker>
-                        <el-button type="primary" size="small" @click="timerBoot()">{{bootAction}}</el-button>
+                       
                     </div>
-                </div>   
+                    <div class="info-box-icon">
+                        <span>
+                            Set Shutdown Time:
+                        </span>
+                        <el-time-picker
+                        arrow-control
+                        v-model="shutdownTime"
+                        :picker-options="{
+                            selectableRange: '00:00:00 - 23:59:59'
+                        }"
+                        placeholder="Please set shutdown time"
+                        size="small"
+                        :disabled="!isAutomatic">
+                        </el-time-picker>
+
+                        <!-- <el-button type="primary" size="small" @click="timerShutDown()">{{shutdownAction}}</el-button> -->
+                    </div>
+                   
+                    <el-button  type="primary" class="btnAction" size="small" @click="timerPowerOnOff()" :disabled="!isAutomatic">{{powerAction}}</el-button>
+                        
+                </div> 
             </el-col>
             
         </el-tab-pane>
@@ -89,9 +98,11 @@
 
     import handleResponse from '@/components/restfulapi/handleResponse'
     import {getSolutionAppValueApi, setSolutionAppValueApi} from '@/components/restfulapi/solutionAppApi';
+    import {setDeviceStatus, getDeviceStatus} from "../../restfulapi/deviceStatusApi"
+    import {appControl} from "../../../assets/js/lwm2mMap"
 
     import cardTemp from "../../../common/cardTemp"
-import { months } from 'moment';
+    import { months } from 'moment';
 
     export default{
         name: 'singleTimerSwitch',
@@ -103,14 +114,14 @@ import { months } from 'moment';
                 setTarget: "/40007/0/27601",
                 
                 //solution app pkg name
-                pkgname: "com.advantech.poweronoff",
+                pkgname: "com.adv.poweronoff",
                 funcIds: {
                     setShutdown: "set_shutdown",
                     setReboot: "set_reboot",
-                    setTimerShutdown: "set_timer_shutdown",
-                    setTimerBoot: "set_timer_boot",
-                    getTimerShutdown: "get_shutdown_time",
-                    getTimerBoot: "get_boot_time"
+                    setPoweronoffTime: "set_poweronoff_time",
+                    getPoweronoffStatus: "get_poweronoff_status",
+                    closePoweronoff: "close_poweronoff",
+                    openPoweronoff: "open_poweronoff"
                 },
 
                 timer: null,
@@ -123,8 +134,8 @@ import { months } from 'moment';
                 timerShutdownIconColor: "#8B4513",
                 timerBootIconColor: "#F0AD4E",
 
-                shutdownAction: "Set",
-                bootAction: "Set"
+                powerAction: "Set",
+                isAutomatic: false
 
 
             }
@@ -151,8 +162,8 @@ import { months } from 'moment';
             initData(){
                 this.shutdownTime =  "";
                 this.bootTime = "";
-                this.bootAction = "Set";
-                this.shutdownAction = "Set";
+                this.powerAction = "Set";
+                this.isAutomatic = false;
             },
             //Mon Jan 13 2020 14:32:57 GMT+0800 (CST) to 14:42:57
             transferTime(value){
@@ -177,7 +188,7 @@ import { months } from 'moment';
                 return new Date(y, m, d, h, s);
             },
 
-            getDeviceVideoStatus(funcid){
+            getSolutionAppStatus(funcid){
                 if(this.selectedAgentId == ""){
                     console.error("selectAgentId is empty");
                     return;
@@ -195,27 +206,25 @@ import { months } from 'moment';
                             let powerControlObj = JSON.parse(res.content.value);
                             if(powerControlObj.errcode == 0){
                                  switch(funcid){
-                                    case this.funcIds.getTimerShutdown:
-                                        let stime = powerControlObj.data.shutdown_time;
-                                        if(stime){
+                                    case this.funcIds.getPoweronoffStatus:
+                                        let stime = powerControlObj.data.poweroff_time;
+                                        let btime = powerControlObj.data.poweron_time;
+                                        if(stime&& btime){
                                             this.shutdownTime = this.transToStandardTime(stime);
-                                            this.shutdownAction = "Reset";
+                                            this.bootTime = this.transToStandardTime(btime);
+                                            this.powerAction = "Reset";
                                         }
+                                        let isAuto = powerControlObj.data.auto_power;
+                                        this.isAutomatic = isAuto== "true"? true: false;
+                                        
 
                                         break;
-                                    case this.funcIds.getTimerBoot:
-                                        let btime = powerControlObj.data.boot_time;
-                                        if(btime){
-                                            this.bootTime = this.transToStandardTime(btime);
-                                            this.bootAction = "Reset";
-                                        }
-                                        break;
-                                    
+                                        
                                     default:
                                         console.error("funcId not support");
                                 }
                             }else{
-                                console.error("[getSolutionAppValueApi]"+this.funcIds+"#errcode:"+videoObj.errcode);
+                                console.error("[getSolutionAppValueApi]"+this.funcIds+"#errcode:"+powerControlObj.errcode);
                             }
                            
                         }
@@ -232,9 +241,7 @@ import { months } from 'moment';
                 }
 
                 setSolutionAppValueApi(this.selectedAgentId, this.setTarget, data).then((obj) => {
-
                     handleResponse(obj, (res) => {
-
                         if(res.status === "CHANGED"){
                             switch(funcId){
                                 case this.funcIds.setShutdown:
@@ -243,10 +250,15 @@ import { months } from 'moment';
                                 case this.funcIds.setReboot:
                                     this.$swal("", "Success", "success")
                                 break;
-                                case this.funcIds.setTimerShutdown:
-                                    this.$swal("", "Success", "success")
+                                case this.funcIds.openPoweronoff:
+                                    this.$swal("", "Success", "success").then(() => {
+                                        this.getSolutionAppStatus(this.funcIds.getPoweronoffStatus);
+                                    })
                                 break;
-                                case this.funcIds.setTimerBoot:
+                                case this.funcIds.closePoweronoff:
+                                     this.$swal("", "Success", "success")
+                                break;
+                                case this.funcIds.timerPowerOnOff:
                                      this.$swal("", "Success", "success")
                                 break;
                                 default:
@@ -287,7 +299,34 @@ import { months } from 'moment';
                 this.setSolutionAppValue(data, this.funcIds.setShutdown);
             },
 
-            timerShutDown(){
+            switchAutomatic(){
+                if(!this.selectedAgentId){
+                    this.$swal("", "Please select device","info").then(() => {
+                        this.isAutomatic= this.isAutomatic == true? false: true;
+                    });
+                    return;
+                }
+                
+                if(this.isAutomatic){
+                    let data = {
+                        appname: this.pkgname,
+                        funcid: this.funcIds.openPoweronoff,
+                        param: ""
+                    }
+                    this.setSolutionAppValue(data, this.funcIds.openPoweronoff);
+                    
+                }else{
+                    let data = {
+                        appname: this.pkgname,
+                        funcid: this.funcIds.closePoweronoff,
+                        param: ""
+                    }
+                    this.setSolutionAppValue(data, this.funcIds.closePoweronoff);
+                }
+                
+            },
+
+            timerPowerOnOff(){
                 if(!this.selectedAgentId){
                     this.$swal("", "Please select device","info");
                     return;
@@ -296,32 +335,63 @@ import { months } from 'moment';
                     this.$swal("", "Please set the shutdown time", 'info');
                     return;
                 }
-                let time = this.transferTime(this.shutdownTime);
-                let data = {
-                    appname: this.pkgname,
-                    funcid: this.funcIds.setTimerShutdown,
-                    param: time
-                }
-                this.setSolutionAppValue(data, this.funcIds.setTimerShutdown);
-            },
-
-            timerBoot(){
-                if(!this.selectedAgentId){
-                    this.$swal("", "Please select device","info");
-                    return;
-                }
                 if(!this.bootTime){
                     this.$swal("", "Please set the boot time", 'info');
                     return;
                 }
-                let time = this.transferTime(this.bootTime);
+                let btime = this.transferTime(this.bootTime);
+                let stime = this.transferTime(this.shutdownTime);
                 let data = {
                     appname: this.pkgname,
-                    funcid: this.funcIds.setTimerBoot,
-                    param: time
+                    funcid: this.funcIds.setPoweronoffTime,
+                    param: stime+","+btime
                 }
                 this.setSolutionAppValue(data, this.funcIds.setTimerBoot);
-            }
+            },
+
+            startSolutionApp(){
+                if(this.selectedAgentId == ""){
+                    console.error("selectAgentId is empty");
+                    return;
+                }
+                this.contentLoading = true;
+                setDeviceStatus(this.selectedAgentId, appControl.startApp, this.pkgname).then((obj) => {
+                    this.contentLoading = false;
+                    handleResponse(obj, (res) => {
+                        if(res.status === "CHANGED"){
+                            this.$swal("", "Success", "success").then(() => {
+                                this.refreshStatus();
+                            })
+                            
+                        }else{
+                            this.$emit("isRunSuccess", false)
+                            _g.handleError(res);
+                        }
+                    })
+                })
+            },
+
+            stopSolutionApp(){
+                if(this.selectedAgentId == ""){
+                    console.error("selectAgentId is empty");
+                    return;
+                }
+                this.contentLoading = true;
+                setDeviceStatus(this.selectedAgentId, appControl.stopApp, this.pkgname).then((obj) => {
+                    this.contentLoading = false;
+                    handleResponse(obj, (res) => {
+                        if(res.status === "CHANGED"){
+                            this.$swal("", "Success", "success").then(() => {
+                                this.initData();
+                            })
+                        }else{
+                            this.$emit("isRunSuccess", true)
+                            _g.handleError(res);
+                        }
+                        
+                    })
+                })
+            },
             
         },
 
@@ -334,8 +404,7 @@ import { months } from 'moment';
             selectedAgentId(val){
                 if(this.isSingleMode) {
                     this.initData();
-                    this.getDeviceVideoStatus(this.funcIds.getTimerShutdown);
-                    this.getDeviceVideoStatus(this.funcIds.getTimerBoot);
+                    this.getSolutionAppStatus(this.funcIds.getPoweronoffStatus);
                 }
             },
            
@@ -395,28 +464,47 @@ import { months } from 'moment';
         width: 100%;
         border-radius: 3px;
         margin: 15px 0px 15px 0px;;
-        text-align: center;
+        text-align: left;
+        .btnAction{
+            margin: 15px 170px;
+            
+        }
         .info-box-icon {
             border-radius: 5px;
             display: block;
-            width: 85%;
+            margin-top: 25px;
             /* float: left; */
             span{
+                display: inline-block;
                 font-size: 14px;
                 color: #606266;
                 text-align: right;
                 vertical-align: middle;
                 margin-right: 5px;
+                width: 230px;
+                text-align: right;
             }
-           
-            /* background: rgba(0, 0, 0, 0.2); */
-            margin-top: 15px;
-            margin: 0.6rem auto;
         
             .icon{
                 position: relative;
                 top:15px;
             }
+        }
+    }
+
+    .switch{
+        margin-top: 10px;
+        margin-bottom: 20px;
+        span{
+            display: inline-block;
+            color: #606266;
+            margin-top: 10px;
+            margin-right: 5rem;
+            font-size: 14px;
+            width: 230px;
+            text-align: right;
+            vertical-align: middle;
+            
         }
     }
 </style>

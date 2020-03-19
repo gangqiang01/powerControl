@@ -273,10 +273,12 @@ export default (function () {
                 return "Shutdown";
                 case "set_reboot":
                 return "Reboot";
-                case "set_timer_shutdown":
-                return "Timer Shutdown";
-                case "set_timer_boot":
-                return "Timer Boot";
+                case "set_poweronoff_time":
+                return "Set Timing Switch";
+                case "close_poweronoff":
+                return "Close Timing Switch";
+                case "open_poweronoff":
+                return "Open Timing Switch";
                 default:
                 return "";
             }
