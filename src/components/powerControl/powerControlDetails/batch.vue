@@ -16,7 +16,7 @@
                             </svg>
                             <!-- <p class="info-box-icon-title">shutdown</p> -->
                         </div>
-                        <el-button type="primary" size="small" @click="shutDown()">Shutdown</el-button>
+                        <el-button type="primary" size="small" @click="shutDown()">Power Off</el-button>
                     </div>   
                 </el-col>
 
@@ -53,7 +53,7 @@
                     <div class="rectangle-box">
                         <div class="info-box-icon">
                             <span class="powerControl_label">
-                                Set Boot Time:
+                                Set Poweron Time:
                             </span>
 
                             <el-time-picker
@@ -70,7 +70,7 @@
                         </div>
                         <div class="info-box-icon">
                              <span class="powerControl_label">
-                                Set Shutdown Time:
+                                Set Poweroff Time:
                             </span>
                             <el-time-picker
                             arrow-control
