@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-table
-            :data="SolutionAppStatusHistoryTableList"
+            :data="solutionAppStatusHistoryTableList"
             tooltip-effect="dark"
             style="width: 100%"
             @selection-change="selectItem"
@@ -177,7 +177,7 @@ export default {
     data() {
         return {
 
-            SolutionAppStatusHistoryTableList: [],
+            solutionAppStatusHistoryTableList: [],
             isshow: false,
             limit: 10,
             dataCount: 0,
@@ -193,6 +193,7 @@ export default {
             //filter status
             statusArray: [],
             pkgname: "com.adv.poweronoff",
+            setTarget: "/40007/0/27601",
         }
     },
 
@@ -277,7 +278,7 @@ export default {
         assignSolutionAppStatusData(res){
             if(Object.prototype.toString.call(res) === "[object Object]" && Object.prototype.toString.call(res.data) === '[object Array]'){
                 this.dataCount = res.count;
-                this.SolutionAppStatusHistoryTableList = res.data;
+                this.solutionAppStatusHistoryTableList = res.data;
                 this.isshow = this.dataCount > this.limit;
                 this.isShowBtnGroup = this.dataCount > 0;
                 this.$emit("getStatusCount")
@@ -333,9 +334,7 @@ export default {
                     }
                 })
                 
-            })            
-                
-                        
+            })                          
         },
 
         reSolutionApp(solutionAppItem){
@@ -382,7 +381,7 @@ export default {
         },
 
         initData(){
-            this.SolutionAppStatusHistoryTableList = [];
+            this.solutionAppStatusHistoryTableList = [];
             this.isShowBtnGroup= false;
             this.isshow= false;
         },
