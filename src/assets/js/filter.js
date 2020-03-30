@@ -161,7 +161,7 @@ export default (function () {
                 case "33":
                 return "Download file error"
                 case "34":
-                return "Request agent timeout"
+                return "Request timeout"
                 case "35":
                 return "Task timeout";
                 case "36":

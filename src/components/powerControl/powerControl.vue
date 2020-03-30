@@ -35,6 +35,7 @@
             @isDisabled="isDisabled"
             @isRunSuccess="isRunSuccess"
             :isOffline="isOffline"
+            :isRunning="isRunning"
             ref="powerControl"
             >
             </single-control>
@@ -42,6 +43,7 @@
             :selectedAgentsData="selectedAgentsData" 
             :isSingleMode="isSingleMode"
             :groupname="groupname"
+            :isRunning="isRunning"
             ></batch-control>
         </el-col>
     </div>

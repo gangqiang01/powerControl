@@ -34,7 +34,7 @@
             </el-col>
             
         </el-tab-pane>
-        <el-tab-pane name="timerPowerControl">
+        <el-tab-pane name="timerPowerControl" v-loading="loading">
             <span slot="label">
                 <svg t="1577949421083" class="icon m-r-5" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6968" width="13" height="13">
                 <path d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m0 938.678C277.339 938.678 85.322 746.66 85.322 512S277.34 85.322 512 85.322 938.678 277.34 938.678 512 746.66 938.678 512 938.678z" p-id="6969" :fill="timerSwitchIcon"></path>
@@ -48,7 +48,8 @@
                     <el-switch
                     v-model="isAutomatic"
                     inactive-color="#aaaaaa"
-                    @change="switchAutomatic()">
+                    @change="switchAutomatic()"
+                    :disabled="!isRunning">
                     </el-switch>
                 </div>
                 <div class="rectangle-box">
@@ -135,8 +136,8 @@
                 timerBootIconColor: "#F0AD4E",
 
                 powerAction: "Set",
-                isAutomatic: false
-
+                isAutomatic: false,
+                loading: false
 
             }
         },
@@ -153,7 +154,12 @@
             isOffline: {
                 type: Boolean,
                 default: false
-            }
+            },
+            isRunning: {
+                type: Boolean,
+                default: false
+            },
+
         },
         components: {
  	        cardTemp
@@ -199,9 +205,10 @@
                     funcid: funcid,
                     param: ""
                 }
+                this.loading = true;
                 getSolutionAppValueApi(this.selectedAgentId, this.getTarget, data).then((obj) => {
+                    this.loading = false;
                     handleResponse(obj, (res) => {
-
                         if(res.status === "CONTENT"){
                             let powerControlObj = JSON.parse(res.content.value);
                             if(powerControlObj.errcode == 0){
@@ -239,8 +246,9 @@
                     console.error("selectAgentId is empty");
                     return;
                 }
-
+                this.loading = true;
                 setSolutionAppValueApi(this.selectedAgentId, this.setTarget, data).then((obj) => {
+                    this.loading = false;
                     handleResponse(obj, (res) => {
                         if(res.status === "CHANGED"){
                             switch(funcId){
@@ -266,6 +274,12 @@
                                 
                             }
                         }else{
+                            if(funcId == this.funcIds.openPoweronoff){
+                                this.isAutomatic = false;
+                            }
+                            if(funcId = this.funcIds.closePoweronoff){
+                                this.isAutomatic = true;
+                            }
                             _g.handleError(res); 
                         }
                         
@@ -360,7 +374,7 @@
                     handleResponse(obj, (res) => {
                         if(res.status === "CHANGED"){
                             this.$swal("", "Success", "success").then(() => {
-                                this.refreshStatus();
+                                this.getSolutionAppStatus(this.funcIds.getPoweronoffStatus);
                             })
                             
                         }else{

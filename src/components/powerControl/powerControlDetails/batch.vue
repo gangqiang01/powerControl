@@ -47,7 +47,8 @@
                         <el-switch
                         v-model="isAutomatic"
                         inactive-color="#aaaaaa"
-                        @change="switchAutomatic()">
+                        @change="switchAutomatic()"
+                        :disabled="!isRunning">
                         </el-switch>
                     </div>
                     <div class="rectangle-box">
@@ -331,7 +332,11 @@
             isSingleMode: {
                 type: Boolean,
                 default: true
-            }
+            },
+            isRunning: {
+                type: Boolean,
+                default: false
+            },
         },
 
         components: {
