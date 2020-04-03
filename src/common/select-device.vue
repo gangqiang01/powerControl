@@ -1,6 +1,6 @@
 <template>
     <div class="m-t-30 m-r-10" v-show="isSingleMode">
-        <div class="text-center m-t-80">
+        <div class="text-center m-t-50">
             <i class="fa fa-tablet fa-5x  m-b-10 c-primary" ></i>
             <p>{{$t('common.deviceList')}}</p>
             <el-select v-model="devValue" ref="devId" class="m-t-10" size="small" filterable>

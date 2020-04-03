@@ -1,7 +1,7 @@
 <template>
-    <div v-show="!isSingleMode" class="m-t-30 m-r-10">
+    <div v-show="!isSingleMode" class="m-t-50 m-r-10">
         <div>
-            <div class="text-center m-t-80">
+            <div class="text-center">
                 <i class="fa fa-object-group fa-4x  m-b-10 c-primary " ></i>
                 <p>{{$t('common.groupList')}}</p>
                 <el-select v-model="groupValue" ref="devId" class="m-t-10" @change = "groupChange" size="small">
@@ -15,7 +15,7 @@
             </div>
         </div>  
         <div v-show="groupValue != ''">
-            <div class="text-center m-t-80">
+            <div class="text-center m-t-50">
                 <i class="fa fa-tablet fa-5x  m-b-10 c-primary" ></i>
                 <p>{{$t('common.onlineDevices')}}</p>
                 <p class="deviceTags">

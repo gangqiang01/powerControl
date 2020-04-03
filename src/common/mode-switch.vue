@@ -1,6 +1,6 @@
 <template>
     <el-switch
-    class="fr p-r-10 m-r-30"
+    class="text-center m-t-20"
     style="display: block"
     v-model="mode"
     @change="modeChange"
